@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Text Chat</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      
+      margin: 0;
+      padding: 20px;
+    }
+    .chat-box {
+      max-width: 600px;
+      margin: 0 auto;
+      background: white;
+      border-radius: 8px;
+      padding: 20px;
+    }
+    .chat {
+      display: flex;
+      flex-direction: column;
+    }
+    .message-container {
+      margin: 10px 0;
+      display: flex;
+      flex-direction: column;
+      max-width: 80%;
+    }
+    .ari-container {
+      align-self: flex-start;
+      color: #6262a6;
+    }
+    .rach-container {
+      align-self: flex-end;
+      text-align: right;
+      color: #d74e40;
+    }
+    .sender-name {
+      font-size: 0.85em;
+      font-weight: bold;
+      margin-bottom: 4px;
+    }
+    .message {
+      padding: 10px 14px;
+      border-radius: 15px;
+      line-height: 1.4;
+      white-space: pre-line;
+      color: white;
+    }
+    .ari {
+      background: #6262a6;
+    }
+    .rach {
+      background: #d74e40;
+      text-align: left;
+    }
+    .typing {
+      font-style: italic;
+      opacity: 0.6;
+    }
+  </style>
+</head>
+<body>
+  <div class="chat-box">
+    <div id="chat" class="chat"></div>
+  </div>
+
+  <script>
+    const chat = document.getElementById('chat');
+    const sentSound = new Audio('sent.wav');
+const receivedSound = new Audio('receive.wav');
+
+    const messages = [
+      { sender: "ari", name: "Ari", text: "Hey Rach, you ok? You’ve been quiet since the weekend." },
+      { sender: "rach", name: "Rach", text: "Yeah… honestly, not great. Mum had to go into hospital, and I’ve had to take time off. Our Partner knows and has been great so far with flexibility for appointments and other things. But I only have so much leave, and it’s going to run out soon. Between rent, bills, and everything else - it’s piling up. I don’t even know where to start." },
+      { sender: "ari", name: "Ari", text: "Oh Rach, I’m so sorry. That’s a lot going on for you! 🩷" },
+      { sender: "rach", name: "Rach", text: "Yeah…feels like a mountain." },
+      { sender: "ari", name: "Ari", text: "Obviously your mum’s health and your own is the most important. I’m here to help if you need. I can call now if you like – or anytime!" },
+      { sender: "rach", name: "Rach", text: "I’d rather just text for now if that’s okay. I want to vent sure, but honestly, if you’ve got any finance tips – fire away!" },
+      { sender: "ari", name: "Ari", text: "From what you’ve mentioned in the past, it sounds like your caring duties may be ramping up." },
+      { sender: "rach", name: "Rach", text: "Yeah…we’re expecting it to." },
+      { sender: "ari", name: "Ari", text: "There’s a few things I can suggest, based on my experience…" },
+      { sender: "ari", name:"Ari", text: "First – Carers NZ. They offer resources and information on a range of support services, care planning, respite and wellbeing to support carers."},
+      { sender: "ari", name:"Ari", text: "Sorted is handy for all your budgeting and it could be helpful to check out."},
+      { sender: "ari", name:"Ari", text: "Then Financial Mentoring. Access the free service via MoneyTalks. You can call, text or have a live online chat with them if that suits you better."},
+      { sender: "rach", name: "Rach", text: "Oh wow – thank you! "},
+      { sender: "ari", name:"Ari", text: "No worries 👍 And remember WeCare through work! There’s a range of emotional and financial services there too!"},
+      { sender: "rach", name:"Rach", text: "Oh right – I’ve been meaning to check them out."},
+      { sender: "ari", name:"Ari", text: "I’m more than happy to come over and help you out with some of this when you’re ready? We could break it down into small chunks and make a plan – how does that sound? "},
+      { sender: "rach", name:"Rach", text: "Ari – you’re the best! Thanks – for reaching out and for your support ❤️"}
+    ];
+
+    let index = 0;
+
+    function showTypingIndicator(sender, name) {
+      const container = document.createElement('div');
+      container.className = `message-container ${sender}-container`;
+      container.id = 'typing';
+
+      const nameLabel = document.createElement('div');
+      nameLabel.className = 'sender-name';
+      nameLabel.textContent = name;
+
+      const typingMsg = document.createElement('div');
+      typingMsg.className = `message ${sender} typing`;
+      typingMsg.textContent = 'is typing...';
+
+      container.appendChild(nameLabel);
+      container.appendChild(typingMsg);
+      chat.appendChild(container);
+      container.scrollIntoView({ behavior: 'smooth' });
+    }
+
+    function removeTypingIndicator() {
+      const typing = document.getElementById('typing');
+      if (typing) typing.remove();
+    }
+
+    function calculateReadTime(text) {
+      const words = text.trim().split(/\s+/).length;
+      return Math.max(1000, words * 200); // At least 1 second, otherwise 300ms per word
+    }
+
+    function showNextMessage() {
+      if (index >= messages.length) return;
+
+      const { sender, name, text } = messages[index];
+
+      showTypingIndicator(sender, name);
+
+      const typingDelay = 1000; // Time before message appears (simulate typing pause)
+      const readTime = calculateReadTime(text);
+
+      setTimeout(() => {
+        removeTypingIndicator();
+// Play sound based on sender
+if (sender === "rach") {
+  sentSound.play();
+} else {
+  receivedSound.play();
+}
+
+        const container = document.createElement('div');
+        container.className = `message-container ${sender}-container`;
+
+        const nameLabel = document.createElement('div');
+        nameLabel.className = 'sender-name';
+        nameLabel.textContent = name;
+
+        const msg = document.createElement('div');
+        msg.className = `message ${sender}`;
+        msg.textContent = text;
+
+        container.appendChild(nameLabel);
+        container.appendChild(msg);
+        chat.appendChild(container);
+        container.scrollIntoView({ behavior: 'smooth' });
+
+        index++;
+        setTimeout(showNextMessage, readTime);
+      }, typingDelay);
+    }
+
+    showNextMessage();
+  </script>
+</body>
+</html>
